@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Enrollment Form</title>
+    <title>CYMH Family Enrollment Form</title>
     <style>
         * {
             margin: 0;
@@ -260,6 +260,24 @@
         </div>
 
         <form id="enrollmentForm">
+            <div class="section-title">REDCap Access</div>
+
+            <div class="form-group">
+                <label for="apiToken">
+                    REDCap API Token<span class="required">*</span>
+                </label>
+                <input 
+                    type="password" 
+                    id="apiToken" 
+                    name="apiToken" 
+                    required
+                    placeholder="Enter your REDCap API token"
+                >
+                <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                    Your API token will not be stored and is only used for this submission.
+                </small>
+            </div>
+
             <div class="section-title">Parent/Guardian Information</div>
 
             <div class="form-group">
@@ -353,11 +371,13 @@
 
     <script>
         // ========================================================================
-        // CONFIGURATION - EDIT THESE VALUES
+        // CONFIGURATION - EDIT THIS VALUE
         // ========================================================================
         const REDCAP_CONFIG = {
-            apiUrl: 'https://your-redcap-instance.org/api/',
-            apiToken: 'YOUR_API_TOKEN_HERE',
+            // REDCap API URL - Update this to your instance
+            apiUrl: 'https://redcap.ctsc.weill.cornell.edu/redcap_protocols/redcap_v15.0.39/API/',
+            
+            // NOTE: API token is entered by user in the form for security
             
             // Event names from your R code
             events: {
@@ -442,6 +462,7 @@
 
         function getFormData() {
             return {
+                apiToken: document.getElementById('apiToken').value.trim(),
                 adultFirstName: document.getElementById('adultFirstName').value.trim(),
                 adultLastName: document.getElementById('adultLastName').value.trim(),
                 adultEmail: document.getElementById('adultEmail').value.trim(),
@@ -455,7 +476,7 @@
             try {
                 // STEP 1: Get next family ID
                 updateProgress(0);
-                const nextFamilyId = await getNextFamilyId();
+                const nextFamilyId = await getNextFamilyId(formData.apiToken);
                 
                 if (!nextFamilyId) {
                     throw new Error('Could not determine next Family ID');
@@ -475,6 +496,7 @@
                 // STEP 4: Get baseline link
                 updateProgress(3);
                 const baselineLink = await getSurveyLink(
+                    formData.apiToken,
                     childId,
                     REDCAP_CONFIG.instruments.childBaseline,
                     REDCAP_CONFIG.events.childBaseline
@@ -483,6 +505,7 @@
                 // STEP 5: Get weekly link
                 updateProgress(4);
                 const weeklyLink = await getSurveyLink(
+                    formData.apiToken,
                     childId,
                     REDCAP_CONFIG.instruments.childWeekly,
                     REDCAP_CONFIG.events.childWeekly
@@ -491,6 +514,7 @@
                 // STEP 6: Get monthly link
                 updateProgress(5);
                 const monthlyLink = await getSurveyLink(
+                    formData.apiToken,
                     childId,
                     REDCAP_CONFIG.instruments.childMonthly,
                     REDCAP_CONFIG.events.childMonthly
@@ -526,9 +550,9 @@
             }
         }
 
-        async function getNextFamilyId() {
+        async function getNextFamilyId(apiToken) {
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
@@ -588,7 +612,7 @@
             }];
 
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: formData.apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
@@ -611,9 +635,9 @@
             console.log(`✓ Child record created: ${childId}`);
         }
 
-        async function getSurveyLink(recordId, instrument, event) {
+        async function getSurveyLink(apiToken, recordId, instrument, event) {
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'surveyLink',
                 record: recordId,
                 instrument: instrument,
@@ -657,7 +681,7 @@
             }];
 
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: formData.apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
