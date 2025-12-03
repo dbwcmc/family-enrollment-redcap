@@ -198,30 +198,6 @@
             font-size: 18px;
         }
 
-        .survey-link {
-            margin: 10px 0;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-            word-break: break-all;
-        }
-
-        .survey-link strong {
-            display: block;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
-        .survey-link a {
-            color: #B31B1B;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .survey-link a:hover {
-            text-decoration: underline;
-        }
-
         .progress {
             margin-top: 20px;
             padding: 15px;
@@ -248,6 +224,13 @@
         .progress-step.current {
             font-weight: bold;
         }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -256,130 +239,128 @@
         <p class="subtitle">Please fill out all required information</p>
 
         <div class="info-box">
-            ℹ️ This form will create linked records in REDCap for patients under 18 or one record for 18+ patients.
+            ℹ️ This form will create records in REDCap. Participants 18+ will have a single PT record, minors will have linked PT and CG records.
         </div>
 
         <form id="enrollmentForm">
             <div class="section-title">Participant Age</div>
 
             <div class="form-group">
-                <label for="participantAge">
-                    Is the participant 18 years or older?<span class="required">*</span>
+                <label for="ptAge">
+                    Participant Age (6-30)<span class="required">*</span>
                 </label>
-                <select 
-                    id="participantAge" 
-                    name="participantAge" 
+                <input 
+                    type="number" 
+                    id="ptAge" 
+                    name="ptAge" 
+                    min="6"
+                    max="30"
                     required
-                    style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; font-family: Arial, sans-serif;"
+                    placeholder="Enter age between 6 and 30"
                 >
-                    <option value="">-- Select --</option>
-                    <option value="adult">Yes, 18 or older</option>
-                    <option value="minor">No, under 18</option>
-                </select>
+                <div class="error-message" id="ageError">Age must be between 6 and 30</div>
             </div>
 
-            <div id="adultFields" style="display: none;">
-                <div class="section-title">Participant Information</div>
+            <div id="cgFields" style="display: none;">
+                <div class="section-title">Parent/Caregiver Information</div>
 
                 <div class="form-group">
-                    <label for="participantFirstName">
-                        First Name<span class="required">*</span>
+                    <label for="cgFirstName">
+                        Caregiver First Name<span class="required">*</span>
                     </label>
                     <input 
                         type="text" 
-                        id="participantFirstName" 
-                        name="participantFirstName" 
+                        id="cgFirstName" 
+                        name="cgFirstName" 
+                        placeholder="Enter caregiver first name"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="cgLastName">
+                        Caregiver Last Name<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="cgLastName" 
+                        name="cgLastName" 
+                        placeholder="Enter caregiver last name"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="cgEmail">
+                        Caregiver Email<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="cgEmail" 
+                        name="cgEmail" 
+                        placeholder="caregiver@example.com"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="cgPhone">
+                        Caregiver Phone Number
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="cgPhone" 
+                        name="cgPhone" 
+                        placeholder="555-123-4567 or 5551234567"
+                    >
+                </div>
+            </div>
+
+            <div id="ptFields" style="display: none;">
+                <div class="section-title">Participant Information</div>
+
+                <div class="form-group">
+                    <label for="ptFirstName">
+                        Participant First Name<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="ptFirstName" 
+                        name="ptFirstName" 
                         placeholder="Enter participant's first name"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="participantLastName">
-                        Last Name<span class="required">*</span>
+                    <label for="ptLastName">
+                        Participant Last Name<span class="required">*</span>
                     </label>
                     <input 
                         type="text" 
-                        id="participantLastName" 
-                        name="participantLastName" 
+                        id="ptLastName" 
+                        name="ptLastName" 
                         placeholder="Enter participant's last name"
                     >
                 </div>
 
                 <div class="form-group">
-                    <label for="participantEmail">
-                        Email<span class="required">*</span>
+                    <label for="ptEmail">
+                        Participant Email<span id="ptEmailRequired" class="required">*</span>
                     </label>
                     <input 
                         type="email" 
-                        id="participantEmail" 
-                        name="participantEmail" 
+                        id="ptEmail" 
+                        name="ptEmail" 
                         placeholder="participant@example.com"
                     >
                 </div>
-            </div>
-
-            <div id="minorFields" style="display: none;">
-                <div class="section-title">Parent/Guardian Information</div>
 
                 <div class="form-group">
-                    <label for="adultFirstName">
-                        Adult First Name<span class="required">*</span>
+                    <label for="ptPhone">
+                        Participant Phone Number
                     </label>
                     <input 
-                        type="text" 
-                        id="adultFirstName" 
-                        name="adultFirstName" 
-                        placeholder="Enter parent/guardian first name"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="adultLastName">
-                        Adult Last Name<span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="adultLastName" 
-                        name="adultLastName" 
-                        placeholder="Enter parent/guardian last name"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="adultEmail">
-                        Adult Email<span class="required">*</span>
-                    </label>
-                    <input 
-                        type="email" 
-                        id="adultEmail" 
-                        name="adultEmail" 
-                        placeholder="parent@example.com"
-                    >
-                </div>
-
-                <div class="section-title">Child Information</div>
-
-                <div class="form-group">
-                    <label for="childFirstName">
-                        Child First Name<span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="childFirstName" 
-                        name="childFirstName" 
-                        placeholder="Enter child's first name"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="childLastName">
-                        Child Last Name<span class="required">*</span>
-                    </label>
-                    <input 
-                        type="text" 
-                        id="childLastName" 
-                        name="childLastName" 
-                        placeholder="Enter child's last name"
+                        type="tel" 
+                        id="ptPhone" 
+                        name="ptPhone" 
+                        placeholder="555-123-4567 or 5551234567"
                     >
                 </div>
             </div>
@@ -403,36 +384,33 @@
             apiUrl: 'https://redcap.ctsc.weill.cornell.edu/redcap_protocols/redcap_v15.0.40/API/',
             apiToken: '7D1C6DD84DE75B2958E16650E011116F',
 
-            // NOTE: API token is entered by user in the form for security
-            
-            // Event names from your R code
+            // Event names
             events: {
-                parentBaseline: 'cg_baseline_arm_1',
-                childBaseline: 'pt_baseline_arm_1',
-                childMonthly: 'pt_month_1_arm_1',
-                adultBaseline: 'pt_baseline_arm_1'  // Adult uses child baseline event
+                baseline: 'baseline_arm_1',
+                week1: 'week1_arm_1',
+                week4: 'week4_arm_1'
             },
             
             // Instrument names from your R code
             instruments: {
-                parentFirst: 'welcome',
-                childBaseline: 'demographics',
-                childMonthly: 'phq8',
-                adultBaseline: 'demographics'  // Adult uses same as child
+                demographics: 'demographics',
+                welcome817: 'welcome_817',
+                welcome67: 'welcome_67'
             },
             
             // Field names - update to match your REDCap project
             fields: {
-                adultEmail: 'adult_email',
-                childEmail: 'child_email',
-                adultFirstName: 'adult_first_name',
-                adultLastName: 'adult_last_name',
-                childFirstName: 'child_first_name',
-                childLastName: 'child_last_name',
-                linkedParentId: 'linked_parent_id',
-                linkedChildId: 'linked_child_id',
-                childBaselineLink: 'child_baseline_link',
-                childMonthlyLink: 'child_monthly_link'
+                cgEmail: 'cg_email',
+                cgPhone: 'cg_phone',
+                ptEmail: 'pt_email',
+                ptPhone: 'pt_phone',
+                cgFirstName: 'cg_first_name',
+                cgLastName: 'cg_last_name',
+                ptFirstName: 'pt_first_name',
+                ptLastName: 'pt_last_name',
+                ptAge: 'pt_age',
+                recordType: 'record_type',
+                ptWeeklyLink: 'pt_weekly_link'
             }
         };
         // ========================================================================
@@ -442,50 +420,48 @@
         const statusMessage = document.getElementById('statusMessage');
         const progressBox = document.getElementById('progressBox');
         const linksDisplay = document.getElementById('linksDisplay');
-        const participantAgeSelect = document.getElementById('participantAge');
-        const adultFields = document.getElementById('adultFields');
-        const minorFields = document.getElementById('minorFields');
+        const ptAgeInput = document.getElementById('ptAge');
+        const cgFields = document.getElementById('cgFields');
+        const ptFields = document.getElementById('ptFields');
+        const ageError = document.getElementById('ageError');
 
-        // Show/hide fields based on age selection
-        participantAgeSelect.addEventListener('change', function() {
-            const isAdult = this.value === 'adult';
-            const isMinor = this.value === 'minor';
-
-            if (isAdult) {
-                adultFields.style.display = 'block';
-                minorFields.style.display = 'none';
-                
-                // Set adult fields as required
-                document.getElementById('participantFirstName').required = true;
-                document.getElementById('participantLastName').required = true;
-                document.getElementById('participantEmail').required = true;
-                
-                // Remove required from minor fields
-                document.getElementById('adultFirstName').required = false;
-                document.getElementById('adultLastName').required = false;
-                document.getElementById('adultEmail').required = false;
-                document.getElementById('childFirstName').required = false;
-                document.getElementById('childLastName').required = false;
-                
-            } else if (isMinor) {
-                adultFields.style.display = 'none';
-                minorFields.style.display = 'block';
-                
-                // Remove required from adult fields
-                document.getElementById('participantFirstName').required = false;
-                document.getElementById('participantLastName').required = false;
-                document.getElementById('participantEmail').required = false;
-                
-                // Set minor fields as required
-                document.getElementById('adultFirstName').required = true;
-                document.getElementById('adultLastName').required = true;
-                document.getElementById('adultEmail').required = true;
-                document.getElementById('childFirstName').required = true;
-                document.getElementById('childLastName').required = true;
-                
+        // Show/hide fields based on age
+        ptAgeInput.addEventListener('input', function() {
+            const age = parseInt(this.value);
+            
+            // Validate age range
+            if (this.value && (age < 6 || age > 30)) {
+                ageError.style.display = 'block';
+                this.setCustomValidity('Age must be between 6 and 30');
             } else {
-                adultFields.style.display = 'none';
-                minorFields.style.display = 'none';
+                ageError.style.display = 'none';
+                this.setCustomValidity('');
+            }
+            
+            if (age >= 6 && age <= 30) {
+                const isMinor = age < 18;
+                
+                ptFields.style.display = 'block';
+                cgFields.style.display = isMinor ? 'block' : 'none';
+                
+                // Set required fields based on age
+                document.getElementById('ptFirstName').required = true;
+                document.getElementById('ptLastName').required = true;
+                document.getElementById('ptEmail').required = !isMinor;
+                document.getElementById('ptEmailRequired').style.display = isMinor ? 'none' : 'inline';
+                
+                if (isMinor) {
+                    document.getElementById('cgFirstName').required = true;
+                    document.getElementById('cgLastName').required = true;
+                    document.getElementById('cgEmail').required = true;
+                } else {
+                    document.getElementById('cgFirstName').required = false;
+                    document.getElementById('cgLastName').required = false;
+                    document.getElementById('cgEmail').required = false;
+                }
+            } else {
+                ptFields.style.display = 'none';
+                cgFields.style.display = 'none';
             }
         });
 
@@ -493,18 +469,16 @@
         const stepsMinor = [
             'Getting existing records...',
             'Calculating next ID...',
-            'Creating child record...',
-            'Getting baseline survey link...',
-            'Getting monthly survey link...',
-            'Creating parent record...',
+            'Creating participant record...',
+            'Getting weekly survey link...',
+            'Creating caregiver record...',
             'Complete!'
         ];
         
         const stepsAdult = [
             'Getting existing records...',
             'Calculating next ID...',
-            'Creating adult record...',
-            'Getting survey links...',
+            'Creating participant record...',
             'Complete!'
         ];
 
@@ -524,9 +498,9 @@
                 
                 if (result.success) {
                     if (result.isAdult) {
-                        showStatus('success', `✓ Success! Adult participant ${result.adultId} enrolled successfully!`);
+                        showStatus('success', `✓ Success! Participant ${result.ptId} enrolled successfully!`);
                     } else {
-                        showStatus('success', `✓ Success! Family ${result.familyId} enrolled successfully!`);
+                        showStatus('success', `✓ Success! Family ${result.recordNumber} enrolled successfully!`);
                     }
                     displayLinks(result);
                     setTimeout(() => form.reset(), 3000);
@@ -542,17 +516,58 @@
             }
         });
 
+        function formatPhoneNumber(phone) {
+            if (!phone) {
+                return '';
+            }
+            
+            // Remove all non-digit characters
+            const digits = phone.replace(/\D/g, '');
+            
+            // Return empty string if no digits or less than 10 digits
+            if (digits.length === 0) {
+                return '';
+            }
+            
+            // Return exactly 10 digits (take last 10 if more were provided)
+            if (digits.length >= 10) {
+                return digits.slice(-10);
+            }
+            
+            // If less than 10 digits, return empty string to avoid validation error
+            return '';
+        }
+
         function getFormData() {
-            const isAdult = document.getElementById('participantAge').value === 'adult';
+            const age = parseInt(document.getElementById('ptAge').value);
+            const isAdult = age >= 18;
+            
+            const cgPhone = formatPhoneNumber(document.getElementById('cgPhone').value.trim());
+            const ptPhone = formatPhoneNumber(document.getElementById('ptPhone').value.trim());
+            const cgEmail = document.getElementById('cgEmail').value.trim();
+            let ptEmail = document.getElementById('ptEmail').value.trim();
+            
+            // If participant is under 18 and pt_email is blank, use cg_email
+            if (!isAdult && !ptEmail && cgEmail) {
+                ptEmail = cgEmail;
+            }
+            
+            console.log('Raw cg_phone:', document.getElementById('cgPhone').value);
+            console.log('Formatted cg_phone:', cgPhone);
+            console.log('Raw pt_phone:', document.getElementById('ptPhone').value);
+            console.log('Formatted pt_phone:', ptPhone);
             
             return {
+                age: age,
                 isAdult: isAdult,
-                adultFirstName: isAdult ? '' : document.getElementById('adultFirstName').value.trim(),
-                adultLastName: isAdult ? '' : document.getElementById('adultLastName').value.trim(),
-                adultEmail: isAdult ? '' : document.getElementById('adultEmail').value.trim(),
-                childFirstName: isAdult ? document.getElementById('participantFirstName').value.trim() : document.getElementById('childFirstName').value.trim(),
-                childLastName: isAdult ? document.getElementById('participantLastName').value.trim() : document.getElementById('childLastName').value.trim(),
-                childEmail: isAdult ? document.getElementById('participantEmail').value.trim() : ''
+                cgFirstName: document.getElementById('cgFirstName').value.trim(),
+                cgLastName: document.getElementById('cgLastName').value.trim(),
+                cgEmail: cgEmail,
+                cgPhone: cgPhone,
+                ptFirstName: document.getElementById('ptFirstName').value.trim(),
+                ptLastName: document.getElementById('ptLastName').value.trim(),
+                ptEmail: ptEmail,
+                ptPhone: ptPhone
             };
         }
 
@@ -583,40 +598,25 @@
             
             // STEP 2: Format ID
             updateProgress(1);
-            const adultId = String(nextRecordNumber).padStart(4, '0') + '-A';
+            const ptId = String(nextRecordNumber).padStart(4, '0') + '-PT';
             
-            console.log(`Creating Adult Record ${nextRecordNumber}: Adult=${adultId}`);
+            console.log(`Creating Adult Participant Record ${nextRecordNumber}: PT=${ptId}`);
             
-            // STEP 3: Create adult record
+            // Determine record_type: 2 if pt_age >= 18
+            const recordType = 2;
+            
+            // STEP 3: Create participant record
             updateProgress(2);
-            await createAdultRecord(adultId, formData);
+            await createPtRecord(ptId, formData, recordType);
             
-            // STEP 4: Get survey links
+            // STEP 4: Done!
             updateProgress(3);
-            const baselineLink = await getSurveyLink(
-                REDCAP_CONFIG.apiToken,
-                adultId,
-                REDCAP_CONFIG.instruments.adultBaseline,
-                REDCAP_CONFIG.events.adultBaseline
-            );
-            
-            const monthlyLink = await getSurveyLink(
-                REDCAP_CONFIG.apiToken,
-                adultId,
-                REDCAP_CONFIG.instruments.childMonthly,
-                REDCAP_CONFIG.events.childMonthly
-            );
-            
-            // STEP 5: Done!
-            updateProgress(4);
             
             return {
                 success: true,
                 isAdult: true,
                 recordNumber: nextRecordNumber,
-                adultId: adultId,
-                baselineLink: baselineLink,
-                monthlyLink: monthlyLink
+                ptId: ptId
             };
         }
 
@@ -631,51 +631,43 @@
             
             // STEP 2: Format IDs
             updateProgress(1);
-            const parentId = String(nextRecordNumber).padStart(4, '0') + '-P';
-            const childId = String(nextRecordNumber).padStart(4, '0') + '-C';
+            const ptId = String(nextRecordNumber).padStart(4, '0') + '-PT';
+            const cgId = String(nextRecordNumber).padStart(4, '0') + '-CG';
             
-            console.log(`Creating Family ${nextRecordNumber}: Parent=${parentId}, Child=${childId}`);
+            console.log(`Creating Family ${nextRecordNumber}: PT=${ptId}, CG=${cgId}`);
             
-            // STEP 3: Create child record
+            // Determine record_type: 3 if 8-17, 4 if <8
+            const recordType = formData.age >= 8 ? 3 : 4;
+            
+            // STEP 3: Create participant record
             updateProgress(2);
-            await createChildRecord(childId, parentId, formData);
+            await createPtRecord(ptId, formData, recordType);
             
-            // STEP 4: Get baseline link
+            // STEP 4: Get weekly survey link
             updateProgress(3);
-            const baselineLink = await getSurveyLink(
+            const weeklyEvent = formData.age >= 8 ? REDCAP_CONFIG.events.week1 : REDCAP_CONFIG.events.week4;
+            const weeklyInstrument = formData.age >= 8 ? REDCAP_CONFIG.instruments.welcome817 : REDCAP_CONFIG.instruments.welcome67;
+            
+            const weeklyLink = await getSurveyLink(
                 REDCAP_CONFIG.apiToken,
-                childId,
-                REDCAP_CONFIG.instruments.childBaseline,
-                REDCAP_CONFIG.events.childBaseline
+                ptId,
+                weeklyInstrument,
+                weeklyEvent
             );
             
-            // STEP 5: Get monthly link
+            // STEP 5: Create caregiver record with weekly link
             updateProgress(4);
-            const monthlyLink = await getSurveyLink(
-                REDCAP_CONFIG.apiToken,
-                childId,
-                REDCAP_CONFIG.instruments.childMonthly,
-                REDCAP_CONFIG.events.childMonthly
-            );
+            await createCgRecord(cgId, formData, weeklyLink);
             
-            // STEP 6: Create parent record with links
+            // STEP 6: Done!
             updateProgress(5);
-            await createParentRecord(parentId, childId, formData, {
-                baselineLink,
-                monthlyLink
-            });
-            
-            // STEP 7: Done!
-            updateProgress(6);
             
             return {
                 success: true,
                 isAdult: false,
-                familyId: nextRecordNumber,
-                parentId,
-                childId,
-                baselineLink,
-                monthlyLink
+                recordNumber: nextRecordNumber,
+                ptId: ptId,
+                cgId: cgId
             };
         }
 
@@ -706,10 +698,10 @@
                 return 1;
             }
 
-            // Find all records (ending with -P, -C, or -A)
+            // Find all records (ending with -PT or -CG)
             const allRecords = records.filter(r => 
                 r.record_id && 
-                (r.record_id.endsWith('-P') || r.record_id.endsWith('-C') || r.record_id.endsWith('-A'))
+                (r.record_id.endsWith('-PT') || r.record_id.endsWith('-CG'))
             );
             
             if (allRecords.length === 0) {
@@ -720,8 +712,8 @@
             // Extract record numbers from all types
             const recordNumbers = allRecords
                 .map(r => {
-                    // Remove the suffix (-P, -C, or -A) and parse the number
-                    const match = r.record_id.match(/^(\d+)-[PCA]$/);
+                    // Remove the suffix (-PT or -CG) and parse the number
+                    const match = r.record_id.match(/^(\d+)-(PT|CG)$/);
                     return match ? parseInt(match[1], 10) : NaN;
                 })
                 .filter(n => !isNaN(n));
@@ -739,14 +731,37 @@
             return nextRecordNumber;
         }
 
-        async function createAdultRecord(adultId, formData) {
+        async function createPtRecord(ptId, formData, recordType) {
             const record = [{
-                record_id: adultId,
-                redcap_event_name: REDCAP_CONFIG.events.adultBaseline,
-                [REDCAP_CONFIG.fields.childEmail]: formData.childEmail,
-                [REDCAP_CONFIG.fields.childFirstName]: formData.childFirstName,
-                [REDCAP_CONFIG.fields.childLastName]: formData.childLastName
+                record_id: ptId,
+                redcap_event_name: REDCAP_CONFIG.events.baseline,
+                [REDCAP_CONFIG.fields.ptFirstName]: formData.ptFirstName,
+                [REDCAP_CONFIG.fields.ptLastName]: formData.ptLastName,
+                [REDCAP_CONFIG.fields.ptAge]: formData.age,
+                [REDCAP_CONFIG.fields.recordType]: recordType
             }];
+            
+            // Only include email/phone if they have values
+            if (formData.ptEmail) {
+                record[0][REDCAP_CONFIG.fields.ptEmail] = formData.ptEmail;
+            }
+            if (formData.ptPhone) {
+                console.log('Adding pt_phone to record:', formData.ptPhone);
+                record[0][REDCAP_CONFIG.fields.ptPhone] = formData.ptPhone;
+            }
+            
+            // If minor, include caregiver information in PT record
+            if (!formData.isAdult) {
+                record[0][REDCAP_CONFIG.fields.cgFirstName] = formData.cgFirstName;
+                record[0][REDCAP_CONFIG.fields.cgLastName] = formData.cgLastName;
+                record[0][REDCAP_CONFIG.fields.cgEmail] = formData.cgEmail;
+                if (formData.cgPhone) {
+                    console.log('Adding cg_phone to record:', formData.cgPhone);
+                    record[0][REDCAP_CONFIG.fields.cgPhone] = formData.cgPhone;
+                }
+            }
+
+            console.log('Creating PT record with data:', JSON.stringify(record, null, 2));
 
             const body = new URLSearchParams({
                 token: REDCAP_CONFIG.apiToken,
@@ -766,24 +781,38 @@
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Failed to create adult record: ${errorText}`);
+                throw new Error(`Failed to create participant record: ${errorText}`);
             }
 
-            console.log(`✓ Adult record created: ${adultId}`);
+            console.log(`✓ Participant record created: ${ptId} (record_type: ${recordType})`);
         }
 
-        async function createChildRecord(childId, parentId, formData) {
+        async function createCgRecord(cgId, formData, weeklyLink) {
             const record = [{
-                record_id: childId,
-                redcap_event_name: REDCAP_CONFIG.events.childBaseline,
-                [REDCAP_CONFIG.fields.adultEmail]: formData.adultEmail,
-                [REDCAP_CONFIG.fields.childEmail]: formData.childEmail,
-                [REDCAP_CONFIG.fields.adultFirstName]: formData.adultFirstName,
-                [REDCAP_CONFIG.fields.adultLastName]: formData.adultLastName,
-                [REDCAP_CONFIG.fields.childFirstName]: formData.childFirstName,
-                [REDCAP_CONFIG.fields.childLastName]: formData.childLastName,
-                [REDCAP_CONFIG.fields.linkedParentId]: parentId
+                record_id: cgId,
+                redcap_event_name: REDCAP_CONFIG.events.baseline,
+                [REDCAP_CONFIG.fields.cgFirstName]: formData.cgFirstName,
+                [REDCAP_CONFIG.fields.cgLastName]: formData.cgLastName,
+                [REDCAP_CONFIG.fields.cgEmail]: formData.cgEmail,
+                [REDCAP_CONFIG.fields.ptFirstName]: formData.ptFirstName,
+                [REDCAP_CONFIG.fields.ptLastName]: formData.ptLastName,
+                [REDCAP_CONFIG.fields.ptAge]: formData.age,
+                [REDCAP_CONFIG.fields.recordType]: 1,  // record_type = 1 for caregivers
+                [REDCAP_CONFIG.fields.ptWeeklyLink]: weeklyLink
             }];
+            
+            // Only include phone numbers if they have values
+            if (formData.cgPhone) {
+                record[0][REDCAP_CONFIG.fields.cgPhone] = formData.cgPhone;
+            }
+            if (formData.ptEmail) {
+                record[0][REDCAP_CONFIG.fields.ptEmail] = formData.ptEmail;
+            }
+            if (formData.ptPhone) {
+                record[0][REDCAP_CONFIG.fields.ptPhone] = formData.ptPhone;
+            }
+
+            console.log('Creating CG record with data:', JSON.stringify(record, null, 2));
 
             const body = new URLSearchParams({
                 token: REDCAP_CONFIG.apiToken,
@@ -803,10 +832,10 @@
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Failed to create child record: ${errorText}`);
+                throw new Error(`Failed to create caregiver record: ${errorText}`);
             }
 
-            console.log(`✓ Child record created: ${childId}`);
+            console.log(`✓ Caregiver record created: ${cgId} (record_type: 1)`);
         }
 
         async function getSurveyLink(apiToken, recordId, instrument, event) {
@@ -838,47 +867,9 @@
             return link;
         }
 
-        async function createParentRecord(parentId, childId, formData, links) {
-            const record = [{
-                record_id: parentId,
-                redcap_event_name: REDCAP_CONFIG.events.parentBaseline,
-                [REDCAP_CONFIG.fields.adultEmail]: formData.adultEmail,
-                [REDCAP_CONFIG.fields.childEmail]: formData.childEmail,
-                [REDCAP_CONFIG.fields.adultFirstName]: formData.adultFirstName,
-                [REDCAP_CONFIG.fields.adultLastName]: formData.adultLastName,
-                [REDCAP_CONFIG.fields.childFirstName]: formData.childFirstName,
-                [REDCAP_CONFIG.fields.childLastName]: formData.childLastName,
-                [REDCAP_CONFIG.fields.linkedChildId]: childId,
-                [REDCAP_CONFIG.fields.childBaselineLink]: links.baselineLink,
-                [REDCAP_CONFIG.fields.childMonthlyLink]: links.monthlyLink
-            }];
-
-            const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
-                content: 'record',
-                format: 'json',
-                type: 'flat',
-                overwriteBehavior: 'normal',
-                data: JSON.stringify(record),
-                returnFormat: 'json'
-            });
-
-            const response = await fetch(REDCAP_CONFIG.apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: body.toString()
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to create parent record: ${errorText}`);
-            }
-
-            console.log(`✓ Parent record created: ${parentId}`);
-        }
-
         function showProgress() {
-            const isAdult = document.getElementById('participantAge').value === 'adult';
+            const age = parseInt(document.getElementById('ptAge').value);
+            const isAdult = age >= 18;
             currentStep = 0;
             progressBox.style.display = 'block';
             updateProgressDisplay(isAdult);
@@ -890,7 +881,8 @@
 
         function updateProgress(step) {
             currentStep = step;
-            const isAdult = document.getElementById('participantAge').value === 'adult';
+            const age = parseInt(document.getElementById('ptAge').value);
+            const isAdult = age >= 18;
             updateProgressDisplay(isAdult);
         }
 
@@ -921,16 +913,16 @@
                     <h3>📋 Enrollment Complete!</h3>
                     <p style="margin-bottom: 15px;">
                         <strong>Record Number:</strong> ${result.recordNumber}<br>
-                        <strong>Adult Record ID:</strong> ${result.adultId}
+                        <strong>Participant Record ID:</strong> ${result.ptId}
                     </p>
                 `;
             } else {
                 linksDisplay.innerHTML = `
                     <h3>📋 Enrollment Complete!</h3>
                     <p style="margin-bottom: 15px;">
-                        <strong>Family ID:</strong> ${result.familyId}<br>
-                        <strong>Parent Record:</strong> ${result.parentId}<br>
-                        <strong>Child Record:</strong> ${result.childId}
+                        <strong>Family ID:</strong> ${result.recordNumber}<br>
+                        <strong>Participant Record:</strong> ${result.ptId}<br>
+                        <strong>Caregiver Record:</strong> ${result.cgId}
                     </p>
                 `;
             }
