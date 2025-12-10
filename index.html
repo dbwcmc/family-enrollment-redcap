@@ -243,6 +243,25 @@
         </div>
 
         <form id="enrollmentForm">
+            <div class="section-title">REDCap API Configuration</div>
+
+            <div class="form-group">
+                <label for="apiToken">
+                    REDCap API Token<span class="required">*</span>
+                </label>
+                <input 
+                    type="password" 
+                    id="apiToken" 
+                    name="apiToken" 
+                    required
+                    placeholder="Enter your REDCap API token"
+                    autocomplete="off"
+                >
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                    Your API token will not be saved and is only used for this session
+                </div>
+            </div>
+
             <div class="section-title">Participant Age</div>
 
             <div class="form-group">
@@ -377,12 +396,11 @@
 
     <script>
         // ========================================================================
-        // CONFIGURATION - EDIT THIS VALUE
+        // CONFIGURATION - Only non-sensitive values here
         // ========================================================================
         const REDCAP_CONFIG = {
             // REDCap API URL
             apiUrl: 'https://redcap.ctsc.weill.cornell.edu/redcap_protocols/redcap_v15.0.40/API/',
-            apiToken: '',
 
             // Event names
             events: {
@@ -503,7 +521,12 @@
                         showStatus('success', `✓ Success! Family ${result.recordNumber} enrolled successfully!`);
                     }
                     displayLinks(result);
-                    setTimeout(() => form.reset(), 3000);
+                    // Reset form but keep the API token
+                    const apiToken = document.getElementById('apiToken').value;
+                    setTimeout(() => {
+                        form.reset();
+                        document.getElementById('apiToken').value = apiToken;
+                    }, 3000);
                 } else {
                     showStatus('error', `✗ Error: ${result.error}`);
                 }
@@ -558,6 +581,7 @@
             console.log('Formatted pt_phone:', ptPhone);
             
             return {
+                apiToken: document.getElementById('apiToken').value.trim(),
                 age: age,
                 isAdult: isAdult,
                 cgFirstName: document.getElementById('cgFirstName').value.trim(),
@@ -590,7 +614,7 @@
         async function enrollAdult(formData) {
             // STEP 1: Get next record ID
             updateProgress(0);
-            const nextRecordNumber = await getNextRecordNumber();
+            const nextRecordNumber = await getNextRecordNumber(formData.apiToken);
             
             if (!nextRecordNumber) {
                 throw new Error('Could not determine next record ID');
@@ -607,7 +631,7 @@
             
             // STEP 3: Create participant record
             updateProgress(2);
-            await createPtRecord(ptId, formData, recordType);
+            await createPtRecord(formData.apiToken, ptId, formData, recordType);
             
             // STEP 4: Done!
             updateProgress(3);
@@ -623,7 +647,7 @@
         async function enrollFamily(formData) {
             // STEP 1: Get next record ID
             updateProgress(0);
-            const nextRecordNumber = await getNextRecordNumber();
+            const nextRecordNumber = await getNextRecordNumber(formData.apiToken);
             
             if (!nextRecordNumber) {
                 throw new Error('Could not determine next record ID');
@@ -641,7 +665,7 @@
             
             // STEP 3: Create participant record
             updateProgress(2);
-            await createPtRecord(ptId, formData, recordType);
+            await createPtRecord(formData.apiToken, ptId, formData, recordType);
             
             // STEP 4: Get weekly survey link
             updateProgress(3);
@@ -649,7 +673,7 @@
             const weeklyInstrument = formData.age >= 8 ? REDCAP_CONFIG.instruments.welcome817 : REDCAP_CONFIG.instruments.welcome67;
             
             const weeklyLink = await getSurveyLink(
-                REDCAP_CONFIG.apiToken,
+                formData.apiToken,
                 ptId,
                 weeklyInstrument,
                 weeklyEvent
@@ -657,7 +681,7 @@
             
             // STEP 5: Create caregiver record with weekly link
             updateProgress(4);
-            await createCgRecord(cgId, formData, weeklyLink);
+            await createCgRecord(formData.apiToken, cgId, formData, weeklyLink);
             
             // STEP 6: Done!
             updateProgress(5);
@@ -671,9 +695,9 @@
             };
         }
 
-        async function getNextRecordNumber() {
+        async function getNextRecordNumber(apiToken) {
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
@@ -731,7 +755,7 @@
             return nextRecordNumber;
         }
 
-        async function createPtRecord(ptId, formData, recordType) {
+        async function createPtRecord(apiToken, ptId, formData, recordType) {
             const record = [{
                 record_id: ptId,
                 redcap_event_name: REDCAP_CONFIG.events.baseline,
@@ -764,7 +788,7 @@
             console.log('Creating PT record with data:', JSON.stringify(record, null, 2));
 
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
@@ -787,7 +811,7 @@
             console.log(`✓ Participant record created: ${ptId} (record_type: ${recordType})`);
         }
 
-        async function createCgRecord(cgId, formData, weeklyLink) {
+        async function createCgRecord(apiToken, cgId, formData, weeklyLink) {
             const record = [{
                 record_id: cgId,
                 redcap_event_name: REDCAP_CONFIG.events.baseline,
@@ -815,7 +839,7 @@
             console.log('Creating CG record with data:', JSON.stringify(record, null, 2));
 
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'record',
                 format: 'json',
                 type: 'flat',
@@ -840,7 +864,7 @@
 
         async function getSurveyLink(apiToken, recordId, instrument, event) {
             const body = new URLSearchParams({
-                token: REDCAP_CONFIG.apiToken,
+                token: apiToken,
                 content: 'surveyLink',
                 record: recordId,
                 instrument: instrument,
